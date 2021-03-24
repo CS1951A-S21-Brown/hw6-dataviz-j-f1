@@ -38,6 +38,13 @@ const parseDate = d3.timeParse("%B %-d, %Y");
   constructRuntimeByYear(movies, MAX_WIDTH - margin.left - margin.right);
 })();
 
+function addOutlinedLabel(parent, text) {
+  const g = parent.append("g");
+  g.append("text").attr("stroke", "white").attr("stroke-width", 3).text(text);
+  g.append("text").text(text);
+  return g;
+}
+
 function constructRuntimeByYear(movies, width) {
   const height = MAX_HEIGHT - margin.top - margin.bottom;
   const svg = d3
@@ -55,8 +62,16 @@ function constructRuntimeByYear(movies, width) {
       minRuntime: d3.min(movies, (d) => d.minutes),
       runtime: d3.mean(movies, (d) => d.minutes),
       maxRuntime: d3.max(movies, (d) => d.minutes),
-    }))
-    .sort((a, b) => a.year - b.year);
+    }));
+
+  for (
+    let year = d3.min(movies, (d) => d.release_year);
+    year <= d3.max(movies, (d) => d.release_year);
+    year++
+  ) {
+    if (!data.some((d) => d.year === year)) data.push({ year });
+  }
+  data.sort((a, b) => a.year - b.year);
 
   const x = d3.scaleLinear(
     d3.extent(data, (d) => d.year),
@@ -75,9 +90,14 @@ function constructRuntimeByYear(movies, width) {
     .text("Average runtime by year");
   svg
     .append("text")
-    .attr("transform", `translate(${width / 2}, -5)`)
+    .attr("transform", `translate(${width / 2}, -7)`)
     .attr("text-anchor", "middle")
     .text("gray region depicts full range of runtimes for the given year");
+  svg
+    .append("text")
+    .attr("transform", `translate(${width / 2}, 10)`)
+    .attr("text-anchor", "middle")
+    .text("hover graph to view details");
 
   svg
     .append("text")
@@ -103,6 +123,7 @@ function constructRuntimeByYear(movies, width) {
     .x((d) => x(d.year))
     .y0((d) => y(d.minRuntime))
     .y1((d) => y(d.maxRuntime))
+    .defined((d) => d.runtime)
     .curve(d3.curveCardinal);
   svg
     .append("path")
@@ -115,6 +136,7 @@ function constructRuntimeByYear(movies, width) {
     .line()
     .x((d) => x(d.year))
     .y((d) => y(d.runtime))
+    .defined((d) => d.runtime)
     .curve(d3.curveCardinal);
   svg
     .append("path")
@@ -123,4 +145,36 @@ function constructRuntimeByYear(movies, width) {
     .attr("stroke", "black")
     .attr("stroke-linejoin", "round")
     .attr("d", line(data));
+
+  const hovers = svg
+    .append("g")
+    .selectAll("g")
+    .data(data.filter((d) => d.runtime))
+    .enter()
+    .append("g");
+  hovers
+    .append("rect")
+    .attr("x", (d) => x(d.year))
+    .attr("y", 0)
+    .attr("width", (d) => x(d.year) - x(d.year - 1))
+    .attr("height", height)
+    .classed("hoverable", true)
+    .attr("fill", "transparent");
+
+  const hovertip = hovers
+    .append("g")
+    .attr("font-size", 15)
+    .classed("hover-target", true)
+    .attr("pointer-events", "none")
+    .attr("transform", (d) => `translate(${x(d.year)}, ${y(d.runtime)})`);
+
+  hovertip.append("circle").attr("r", 5).attr("fill", "rebeccapurple");
+  addOutlinedLabel(hovertip, (d) => d.year)
+    .attr("transform", "translate(-10, 5)")
+    .attr("text-anchor", "end");
+
+  addOutlinedLabel(hovertip, (d) => Math.round(d.runtime) + "m").attr(
+    "transform",
+    "translate(10, 5)"
+  );
 }
