@@ -1,7 +1,7 @@
 // Add your JavaScript code here
 const MAX_WIDTH = Math.max(1080, window.innerWidth);
 const MAX_HEIGHT = 720;
-const margin = { top: 40, right: 100, bottom: 40, left: 175 };
+const margin = { top: 40, right: 100, bottom: 40, left: 100 };
 
 // Assumes the same graph width, height dimensions as the example dashboard. Feel free to change these if you'd like
 let graph_1_width = MAX_WIDTH / 2 - 10,
@@ -35,5 +35,49 @@ const parseDate = d3.timeParse("%B %-d, %Y");
     .filter((d) => d.type === "TV Show")
     .map(({ duration, ...m }) => ({ ...m, seasons: parseInt(duration) }));
 
-  debugger;
+  constructRuntimeByYear(movies, MAX_WIDTH - margin.left - margin.right);
 })();
+
+function constructRuntimeByYear(movies, width) {
+  const height = MAX_HEIGHT - margin.top - margin.bottom;
+  const svg = d3
+    .select("#graph1")
+    .append("svg")
+    .attr("width", MAX_WIDTH)
+    .attr("height", MAX_HEIGHT)
+    .append("g")
+    .attr("transform", `translate(${margin.left}, ${margin.top})`);
+
+  const data = d3
+    .groups(movies, (d) => d.release_year)
+    .map(([year, movies]) => ({
+      year,
+      runtime: d3.mean(movies, (d) => d.minutes),
+    }))
+    .sort((a, b) => a.year - b.year);
+
+  const x = d3.scaleLinear(
+    d3.extent(data, (d) => d.year),
+    [0, width]
+  );
+  const y = d3
+    .scaleLinear([d3.max(data, (d) => d.runtime), 0], [0, height])
+    .nice();
+
+  svg
+    .append("text")
+    .attr("transform", `translate(-50, ${height / 2}) rotate(-90)`)
+    .attr("text-anchor", "middle")
+    .text("Average runtime (minutes)");
+  svg.append("g").call(d3.axisLeft(y));
+  svg
+    .append("g")
+    .attr("transform", `translate(0, ${height})`)
+    .call(d3.axisBottom(x).ticks(20, "d"))
+    .selectAll("text")
+    .remove();
+  svg
+    .append("g")
+    .attr("transform", `translate(0, ${height})`)
+    .call(d3.axisBottom(x).ticks(10, "d").tickSize(10));
+}
