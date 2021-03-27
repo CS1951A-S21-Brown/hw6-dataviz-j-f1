@@ -1,6 +1,9 @@
-export function addOutlinedLabel(parent, text) {
+export function addOutlinedLabel(parent, text, width = 4) {
   const g = parent.append("g");
-  g.append("text").attr("stroke", "white").attr("stroke-width", 3).text(text);
+  g.append("text")
+    .attr("stroke", "white")
+    .attr("stroke-width", width)
+    .text(text);
   g.append("text").text(text);
   return g;
 }

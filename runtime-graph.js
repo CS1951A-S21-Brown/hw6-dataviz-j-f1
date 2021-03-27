@@ -39,18 +39,7 @@ export default function (target, movies, selected) {
   data.sort((a, b) => a.year - b.year);
 
   const x = d3.scaleLinear([1972, 2020], [0, width]);
-  const y = d3
-    .scaleLinear(
-      [
-        Math.min(
-          d3.max(movies, (d) => d.minutes),
-          250
-        ),
-        0,
-      ],
-      [0, height]
-    )
-    .nice();
+  const y = d3.scaleLinear([250, 0], [0, height]).nice();
 
   svg
     .append("text")
@@ -83,7 +72,7 @@ export default function (target, movies, selected) {
   svg
     .append("g")
     .attr("transform", `translate(0, ${height})`)
-    .call(d3.axisBottom(x).ticks(20, "d"))
+    .call(d3.axisBottom(x).ticks(50, "d"))
     .selectAll("text")
     .remove();
   svg
@@ -142,6 +131,24 @@ export default function (target, movies, selected) {
     .attr("transform", (d) => `translate(${x(d.year)}, ${y(d.runtime)})`);
 
   hovertip
+    .append("line")
+    .attr("x0", 0)
+    .attr("x1", 0)
+    .attr("y0", 0)
+    .attr("y1", y.range()[1] + 22)
+    .attr("transform", (d) => `translate(0, ${-y(d.runtime)})`)
+    .attr("stroke", "white")
+    .attr("stroke-width", 5);
+  hovertip
+    .append("line")
+    .attr("x0", 0)
+    .attr("x1", 0)
+    .attr("y0", 0)
+    .attr("y1", y.range()[1] + 10)
+    .attr("transform", (d) => `translate(0, ${-y(d.runtime)})`)
+    .attr("stroke", COLOR);
+
+  hovertip
     .append("circle")
     .attr("r", 5)
     .attr("fill", COLOR)
@@ -154,14 +161,14 @@ export default function (target, movies, selected) {
         ? null
         : 1;
     });
-  addOutlinedLabel(hovertip, (d) => d.year)
+
+  addOutlinedLabel(hovertip, (d) => d.year, 5)
+    .attr("transform", (d) => `translate(0, ${y(0) - y(d.runtime) + 24})`)
+    .attr("text-anchor", "middle");
+
+  addOutlinedLabel(hovertip, (d) => Math.round(d.runtime) + "m")
     .attr("transform", "translate(-10, 5)")
     .attr("text-anchor", "end");
-
-  addOutlinedLabel(hovertip, (d) => Math.round(d.runtime) + "m").attr(
-    "transform",
-    "translate(10, 5)"
-  );
 
   const extremities = hovertip.append("g").attr("text-anchor", "middle");
 
