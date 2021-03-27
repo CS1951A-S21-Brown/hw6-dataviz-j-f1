@@ -1,4 +1,5 @@
 import makeRuntimeGraph from "./runtime-graph.js";
+import makeGenreTable from "./genre-table.js";
 
 const delist = (s) => s.split(", ").filter(Boolean);
 const parseDate = d3.timeParse("%B %-d, %Y");
@@ -24,8 +25,17 @@ const parseDate = d3.timeParse("%B %-d, %Y");
     .filter((d) => d.type === "TV Show")
     .map(({ duration, ...m }) => ({ ...m, seasons: parseInt(duration) }));
 
-  makeRuntimeGraph(
-    d3.select("#graph3"),
-    movies.filter((m) => m.release_year >= 1972)
-  );
+  let selected = new Set(movies.flatMap((m) => m.listed_in));
+  const setSelected = (newSelected) => {
+    selected = newSelected;
+    makeRuntimeGraph(
+      d3.select("#graph3"),
+      movies.filter((m) => m.release_year >= 1972),
+      selected
+    );
+
+    makeGenreTable(d3.select("#graph1"), movies, selected, setSelected);
+  };
+  window.addEventListener("resize", () => setSelected(selected));
+  setSelected(selected);
 })();

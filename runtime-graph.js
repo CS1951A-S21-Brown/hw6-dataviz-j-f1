@@ -5,10 +5,9 @@ import {
   graph_3_height,
 } from "./util.js";
 
-export default function (target, movies) {
+export default function (target, movies, selected) {
   const width = graph_3_width - margin.left - margin.right;
   const height = graph_3_height - margin.top - margin.bottom;
-  debugger;
   const svg = target
     .html("")
     .append("svg")
@@ -18,7 +17,10 @@ export default function (target, movies) {
     .attr("transform", `translate(${margin.left}, ${margin.top})`);
 
   const data = d3
-    .groups(movies, (d) => d.release_year)
+    .groups(
+      movies.filter((m) => m.listed_in.some((g) => selected.has(g))),
+      (d) => d.release_year
+    )
     .map(([year, movies]) => ({
       year,
       minRuntime: d3.min(movies, (d) => d.minutes),
@@ -35,10 +37,7 @@ export default function (target, movies) {
   }
   data.sort((a, b) => a.year - b.year);
 
-  const x = d3.scaleLinear(
-    d3.extent(data, (d) => d.year),
-    [0, width]
-  );
+  const x = d3.scaleLinear([1972, 2020], [0, width]);
   const y = d3
     .scaleLinear(
       [
@@ -129,7 +128,15 @@ export default function (target, movies) {
     .attr("y", 0)
     .attr("width", (d) => x(d.year) - x(d.year - 1))
     .attr("height", height)
-    .classed("hoverable", true)
+    .classed("hoverable", (d) => {
+      const idx = data.findIndex((el) => el.year === d.year);
+      return (
+        idx === 0 ||
+        idx === data.length - 1 ||
+        data[idx - 1].runtime != null ||
+        data[idx + 1].runtime != null
+      );
+    })
     .attr("fill", "transparent");
 
   const hovertip = hovers
@@ -149,9 +156,11 @@ export default function (target, movies) {
     "translate(10, 5)"
   );
   addOutlinedLabel(hovertip, (d) => `min: ${Math.round(d.minRuntime)}m`)
+    .attr("hidden", (d) => (d.minRuntime === d.runtime ? "" : null))
     .attr("transform", (d) => `translate(0, ${y(d.minRuntime) - y(d.runtime)})`)
     .attr("text-anchor", "middle");
   addOutlinedLabel(hovertip, (d) => `max: ${Math.round(d.maxRuntime)}m`)
+    .attr("hidden", (d) => (d.maxRuntime === d.runtime ? "" : null))
     .attr(
       "transform",
       (d) => `translate(0, ${y(Math.min(d.maxRuntime, 250)) - y(d.runtime)})`
