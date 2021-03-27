@@ -1,4 +1,4 @@
-import { graph_1_width } from "./util.js";
+import { graph_1_width, formatNumber } from "./util.js";
 
 // Heavily modified from an earlier chart I published here: https://observablehq.com/@j-f1/dear-blueno-analysis
 export default function (target, movies, selected, setSelected) {
@@ -32,7 +32,9 @@ export default function (target, movies, selected, setSelected) {
     .style("margin", "0")
     .attr("for", "checkbox-all")
     .text("Genre");
-  header.append("th").text("Number of films");
+  header
+    .append("th")
+    .text(`Number of films (total: ${formatNumber(movies.length)})`);
 
   const rows = table
     .append("tbody")
@@ -74,5 +76,5 @@ export default function (target, movies, selected, setSelected) {
     .style("--width", (d) => `${(d[1].length / maxCount) * 100}%`)
     .attr("data-text", (d) => d3.format(",")(d[1].length))
     .classed("with-bar", true)
-    .text((d) => d3.format(",")(d[1].length));
+    .text((d) => formatNumber(d[1].length));
 }

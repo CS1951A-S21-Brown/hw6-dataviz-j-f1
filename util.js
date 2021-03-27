@@ -4,6 +4,8 @@ export function addOutlinedLabel(parent, text) {
   g.append("text").text(text);
   return g;
 }
+
+export const formatNumber = d3.format(",");
 export const margin = { top: 100, right: 30, bottom: 40, left: 70 };
 
 export const BREAKPOINT = 992;

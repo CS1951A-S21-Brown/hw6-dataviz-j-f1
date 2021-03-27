@@ -5,6 +5,7 @@ import {
   graph_2_height,
 } from "./util.js";
 
+const COLOR = "#7846b5";
 export default function (target, movies, selected) {
   const width = graph_2_width() - margin.left - margin.right;
   const height = graph_2_height() - margin.top - margin.bottom;
@@ -100,7 +101,7 @@ export default function (target, movies, selected) {
   svg
     .append("path")
     .attr("stroke-width", "2")
-    .attr("fill", "#7846b5")
+    .attr("fill", COLOR)
     .attr("opacity", 0.25)
     .attr("d", area(data));
 
@@ -114,7 +115,7 @@ export default function (target, movies, selected) {
     .append("path")
     .attr("fill", "none")
     .attr("stroke-width", "3")
-    .attr("stroke", "#7846b5")
+    .attr("stroke", COLOR)
     .attr("stroke-linejoin", "round")
     .attr("d", line(data));
 
@@ -126,19 +127,11 @@ export default function (target, movies, selected) {
     .append("g");
   hovers
     .append("rect")
-    .attr("x", (d) => x(d.year))
+    .attr("x", (d) => x(d.year - 0.5))
     .attr("y", 0)
     .attr("width", (d) => x(d.year) - x(d.year - 1))
     .attr("height", height)
-    .classed("hoverable", (d) => {
-      const idx = data.findIndex((el) => el.year === d.year);
-      return (
-        idx === 0 ||
-        idx === data.length - 1 ||
-        data[idx - 1].runtime != null ||
-        data[idx + 1].runtime != null
-      );
-    })
+    .classed("hoverable", true)
     .attr("fill", "transparent");
 
   const hovertip = hovers
@@ -148,7 +141,19 @@ export default function (target, movies, selected) {
     .attr("pointer-events", "none")
     .attr("transform", (d) => `translate(${x(d.year)}, ${y(d.runtime)})`);
 
-  hovertip.append("circle").attr("r", 5).attr("fill", "rebeccapurple");
+  hovertip
+    .append("circle")
+    .attr("r", 5)
+    .attr("fill", COLOR)
+    .style("opacity", (d) => {
+      const idx = data.findIndex((el) => el.year === d.year);
+      return idx === 0 ||
+        idx === data.length - 1 ||
+        data[idx - 1].runtime != null ||
+        data[idx + 1].runtime != null
+        ? null
+        : 1;
+    });
   addOutlinedLabel(hovertip, (d) => d.year)
     .attr("transform", "translate(-10, 5)")
     .attr("text-anchor", "end");
@@ -157,15 +162,24 @@ export default function (target, movies, selected) {
     "transform",
     "translate(10, 5)"
   );
-  addOutlinedLabel(hovertip, (d) => `min: ${Math.round(d.minRuntime)}m`)
+
+  const extremities = hovertip.append("g").attr("text-anchor", "middle");
+
+  addOutlinedLabel(extremities, (d) => `min: ${Math.round(d.minRuntime)}m`)
     .attr("hidden", (d) => (d.minRuntime === d.runtime ? "" : null))
-    .attr("transform", (d) => `translate(0, ${y(d.minRuntime) - y(d.runtime)})`)
-    .attr("text-anchor", "middle");
-  addOutlinedLabel(hovertip, (d) => `max: ${Math.round(d.maxRuntime)}m`)
+    .attr(
+      "transform",
+      (d) => `translate(0, ${Math.max(30, y(d.minRuntime) - y(d.runtime))})`
+    );
+
+  addOutlinedLabel(extremities, (d) => `max: ${Math.round(d.maxRuntime)}m`)
     .attr("hidden", (d) => (d.maxRuntime === d.runtime ? "" : null))
     .attr(
       "transform",
-      (d) => `translate(0, ${y(Math.min(d.maxRuntime, 250)) - y(d.runtime)})`
-    )
-    .attr("text-anchor", "middle");
+      (d) =>
+        `translate(0, ${Math.min(
+          -22,
+          y(Math.min(d.maxRuntime, 250)) - y(d.runtime)
+        )})`
+    );
 }

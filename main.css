@@ -12,12 +12,14 @@ h5 {
 
 /* Include any custom CSS styling here! */
 
-.hoverable + .hover-target {
+.hoverable + .hover-target > * {
   opacity: 0;
+  /* transition: opacity 0.2s 0.1s; */
 }
-.hover-target:hover,
-.hoverable:hover + .hover-target {
+.hover-target:hover > *,
+.hoverable:hover + .hover-target > * {
   opacity: 1;
+  /* transition: opacity 0.1s; */
 }
 
 td.with-bar {
@@ -38,4 +40,9 @@ td.with-bar::before {
   background: steelblue;
   opacity: 0.33;
   overflow-x: hidden;
+}
+
+input[type="checkbox"] {
+  position: relative;
+  bottom: 3px;
 }
