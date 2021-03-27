@@ -37,5 +37,6 @@ const parseDate = d3.timeParse("%B %-d, %Y");
     );
   };
   window.addEventListener("resize", () => setSelected(selected));
+
   setSelected(selected);
 })();

@@ -1,18 +1,18 @@
 import {
   addOutlinedLabel,
   margin,
-  graph_3_width,
-  graph_3_height,
+  graph_2_width,
+  graph_2_height,
 } from "./util.js";
 
 export default function (target, movies, selected) {
-  const width = graph_3_width - margin.left - margin.right;
-  const height = graph_3_height - margin.top - margin.bottom;
+  const width = graph_2_width() - margin.left - margin.right;
+  const height = graph_2_height() - margin.top - margin.bottom;
   const svg = target
     .html("")
     .append("svg")
-    .attr("width", graph_3_width)
-    .attr("height", graph_3_height)
+    .attr("width", graph_2_width())
+    .attr("height", graph_2_height())
     .append("g")
     .attr("transform", `translate(${margin.left}, ${margin.top})`);
 
@@ -73,7 +73,7 @@ export default function (target, movies, selected) {
 
   svg
     .append("text")
-    .attr("transform", `translate(-50, ${height / 2}) rotate(-90)`)
+    .attr("transform", `translate(-40, ${height / 2}) rotate(-90)`)
     .attr("text-anchor", "middle")
     .text("Average runtime (minutes)");
 

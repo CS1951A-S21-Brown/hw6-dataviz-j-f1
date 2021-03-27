@@ -5,8 +5,7 @@ export default function (target, movies, selected, setSelected) {
   const table = target
     .html("")
     .append("table")
-    .style("margin", "1em")
-    .style("width", graph_1_width + "px");
+    .style("width", graph_1_width() + "px");
   const data = movies.reduce((acc, movie) => {
     for (const genre of movie.listed_in) {
       if (!acc.has(genre)) acc.set(genre, []);
