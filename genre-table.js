@@ -1,6 +1,6 @@
 import { graph_1_width } from "./util.js";
 
-// Adapted from the first graph I created here: https://observablehq.com/@j-f1/dear-blueno-analysis
+// Heavily modified from an earlier chart I published here: https://observablehq.com/@j-f1/dear-blueno-analysis
 export default function (target, movies, selected, setSelected) {
   const table = target
     .html("")

@@ -24,28 +24,18 @@ td.with-bar {
   position: relative;
   --padding: 0.25em;
   padding-left: var(--padding);
-  color: white;
 }
-td.with-bar::before,
-td.with-bar::after {
+td.with-bar::before {
   position: absolute;
   height: calc(100% + 1px);
   z-index: -1;
   color: black;
   left: 0;
   top: 0;
-  width: 100%;
   pointer-events: none;
-}
-td.with-bar::before {
-  content: attr(data-text);
-  clip-path: inset(0 0 0 var(--width));
-  padding: 1px var(--padding);
-  z-index: 1;
-}
-td.with-bar::after {
   content: "";
   width: var(--width);
   background: steelblue;
+  opacity: 0.33;
   overflow-x: hidden;
 }

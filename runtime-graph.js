@@ -62,7 +62,9 @@ export default function (target, movies, selected) {
     .append("text")
     .attr("transform", `translate(${width / 2}, -7)`)
     .attr("text-anchor", "middle")
-    .text("gray region depicts full range of runtimes for the given year");
+    .text(
+      "light purple region depicts full range of runtimes for the given year"
+    );
   svg
     .append("text")
     .attr("transform", `translate(${width / 2}, 10)`)
@@ -98,7 +100,7 @@ export default function (target, movies, selected) {
   svg
     .append("path")
     .attr("stroke-width", "2")
-    .attr("fill", "black")
+    .attr("fill", "#7846b5")
     .attr("opacity", 0.25)
     .attr("d", area(data));
 
@@ -112,7 +114,7 @@ export default function (target, movies, selected) {
     .append("path")
     .attr("fill", "none")
     .attr("stroke-width", "3")
-    .attr("stroke", "black")
+    .attr("stroke", "#7846b5")
     .attr("stroke-linejoin", "round")
     .attr("d", line(data));
 

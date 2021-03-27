@@ -28,13 +28,13 @@ const parseDate = d3.timeParse("%B %-d, %Y");
   let selected = new Set(movies.flatMap((m) => m.listed_in));
   const setSelected = (newSelected) => {
     selected = newSelected;
+
+    makeGenreTable(d3.select("#graph1"), movies, selected, setSelected);
     makeRuntimeGraph(
-      d3.select("#graph3"),
+      d3.select("#graph2"),
       movies.filter((m) => m.release_year >= 1972),
       selected
     );
-
-    makeGenreTable(d3.select("#graph1"), movies, selected, setSelected);
   };
   window.addEventListener("resize", () => setSelected(selected));
   setSelected(selected);
