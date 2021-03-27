@@ -39,25 +39,25 @@ export default function (target, movies, selected) {
   data.sort((a, b) => a.year - b.year);
 
   const x = d3.scaleLinear([1972, 2020], [0, width]);
-  const y = d3.scaleLinear([250, 0], [0, height]).nice();
+  const y = d3.scaleLinear([210, 0], [0, height]).nice();
 
   svg
     .append("text")
-    .attr("transform", `translate(${width / 2}, -25)`)
+    .attr("transform", `translate(${width / 2}, -45)`)
     .attr("font-size", 20)
     .attr("font-weight", "bold")
     .attr("text-anchor", "middle")
     .text("Average runtime by year (1972–present)");
   svg
     .append("text")
-    .attr("transform", `translate(${width / 2}, -7)`)
+    .attr("transform", `translate(${width / 2}, -27)`)
     .attr("text-anchor", "middle")
     .text(
       "light purple region depicts full range of runtimes for the given year"
     );
   svg
     .append("text")
-    .attr("transform", `translate(${width / 2}, 10)`)
+    .attr("transform", `translate(${width / 2}, -10)`)
     .attr("text-anchor", "middle")
     .text("hover graph to view details");
 
