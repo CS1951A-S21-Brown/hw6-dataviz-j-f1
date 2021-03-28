@@ -80,10 +80,10 @@ export default function actorsDirectors(target, movies, genres) {
       d3.forceLink(links).id((d) => d.id)
     )
     .force("charge", d3.forceManyBody().strength(-5).distanceMax(200))
-    .force("top", d3.forceY(-offset).strength(0.005))
-    .force("bottom", d3.forceY(graph_2_height() + offset).strength(0.005))
-    .force("left", d3.forceX(0).strength(0.002))
-    .force("right", d3.forceX(graph_2_width()).strength(0.002))
+    .force("top", d3.forceY(-offset).strength(0.0055))
+    .force("bottom", d3.forceY(graph_2_height() + offset).strength(0.0055))
+    .force("left", d3.forceX(0).strength(0.003))
+    .force("right", d3.forceX(graph_2_width()).strength(0.003))
     .force("center", d3.forceCenter(graph_2_width() / 2, graph_2_height() / 2))
     .force("radius", d3.forceCollide(12));
 
