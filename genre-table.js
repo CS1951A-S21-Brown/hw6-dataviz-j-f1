@@ -44,11 +44,10 @@ export default function (target, allMovies, year, state, setState) {
   genreHeader
     .append("button")
     .text("sort a-z")
-    .attr(
-      "class",
-      "btn btn-sm " +
-        (state.sort === "genre" ? "btn-secondary" : "btn-outline-success")
-    )
+    .attr("class", "btn btn-sm btn-link")
+    .property("disabled", state.sort === "genre")
+    .style("padding", 0)
+    .style("font-size", "inherit")
     .on("click", () => setState({ sort: "genre" }));
 
   const countHeader = header.append("th");
@@ -62,11 +61,10 @@ export default function (target, allMovies, year, state, setState) {
   countHeader
     .append("button")
     .text("sort by")
-    .attr(
-      "class",
-      "btn btn-sm " +
-        (state.sort === "genre" ? "btn-outline-success" : "btn-secondary")
-    )
+    .attr("class", "btn btn-sm btn-link")
+    .property("disabled", state.sort === "count")
+    .style("padding", 0)
+    .style("font-size", "inherit")
     .on("click", () => setState({ sort: "count" }));
 
   const rows = table
