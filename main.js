@@ -29,15 +29,21 @@ const parseDate = d3.timeParse("%B %-d, %Y");
   let genres = new Set(movies.flatMap((m) => m.listed_in));
   let showPairs = false;
   let year = 1972;
+  let sort = "genre";
   const setState = (updated) => {
     genres = updated.genres || genres;
     showPairs = updated.showPairs != null ? updated.showPairs : showPairs;
     year = updated.year ?? year;
+    sort = updated.sort || sort;
 
     const filteredMovies = movies.filter((m) => m.release_year >= year);
 
-    makeGenreTable(d3.select("#graph1"), movies, year, genres, (genres) =>
-      setState({ genres })
+    makeGenreTable(
+      d3.select("#graph1"),
+      movies,
+      year,
+      { genres, sort },
+      setState
     );
     document.getElementById("net-explanation").hidden = !showPairs;
     if (showPairs) {

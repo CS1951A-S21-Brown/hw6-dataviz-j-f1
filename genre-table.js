@@ -1,26 +1,26 @@
 import { graph_1_width, formatNumber } from "./util.js";
 
 // Heavily modified from an earlier chart I published here: https://observablehq.com/@j-f1/dear-blueno-analysis
-export default function (target, allMovies, year, selected, setSelected) {
+export default function (target, allMovies, year, state, setState) {
   const table = target
     .html("")
     .append("table")
     .style("width", graph_1_width() + "px");
-  const data = [
-    ...allMovies.reduce((acc, movie) => {
-      for (const genre of movie.listed_in) {
-        if (!acc.has(genre)) acc.set(genre, []);
-        acc.get(genre).push(movie);
-      }
-      return acc;
-    }, new Map()),
-  ]
-    .map(([genre, movies]) => [
+  const data = d3.sort(
+    [
+      ...allMovies.reduce((acc, movie) => {
+        for (const genre of movie.listed_in) {
+          if (!acc.has(genre)) acc.set(genre, []);
+          acc.get(genre).push(movie);
+        }
+        return acc;
+      }, new Map()),
+    ].map(([genre, movies]) => [
       genre,
       movies.filter((m) => m.release_year >= year),
-    ])
-    .sort();
-
+    ]),
+    state.sort === "genre" ? (d) => d[0] : (d) => -d[1].length
+  );
   const header = table.append("thead").append("tr");
 
   header
@@ -30,28 +30,44 @@ export default function (target, allMovies, year, selected, setSelected) {
     .attr("id", "checkbox-all")
     .property(
       "checked",
-      [...data].every(([genre]) => selected.has(genre))
+      [...data].every(([genre]) => state.genres.has(genre))
     )
     .property(
       "indeterminate",
-      selected.size && [...data].some(([genre]) => !selected.has(genre))
+      state.genres.size && [...data].some(([genre]) => !state.genres.has(genre))
     )
     .on("change", () =>
-      setSelected(selected.size ? new Set() : new Set(data.keys()))
+      setState({ genres: state.genres.size ? new Set() : new Set(data.keys()) })
     );
-  header
-    .append("th")
-    .append("label")
-    .style("margin", "0")
-    .attr("for", "checkbox-all")
-    .text("Genre");
-  header
-    .append("th")
+  const genreHeader = header.append("th");
+  genreHeader.append("span").text("Genre ");
+  genreHeader
+    .append("button")
+    .text("sort a-z")
+    .attr(
+      "class",
+      "btn btn-sm " +
+        (state.sort === "genre" ? "btn-secondary" : "btn-outline-success")
+    )
+    .on("click", () => setState({ sort: "genre" }));
+
+  const countHeader = header.append("th");
+  countHeader
+    .append("span")
     .text(
       `Number of films (total: ${formatNumber(
         allMovies.filter((m) => m.release_year >= year).length
-      )})`
+      )}) `
     );
+  countHeader
+    .append("button")
+    .text("sort by")
+    .attr(
+      "class",
+      "btn btn-sm " +
+        (state.sort === "genre" ? "btn-outline-success" : "btn-secondary")
+    )
+    .on("click", () => setState({ sort: "count" }));
 
   const rows = table
     .append("tbody")
@@ -69,14 +85,14 @@ export default function (target, allMovies, year, selected, setSelected) {
     .attr("type", "checkbox")
     .property("disabled", (d) => d[1].length === 0)
     .property("indeterminate", (d) => d[1].length === 0)
-    .property("checked", (d) => selected.has(d[0]))
+    .property("checked", (d) => state.genres.has(d[0]))
     .attr("id", (d) => makeId(d[0]))
     .on("change", (_, d) =>
-      setSelected(
-        selected.has(d[0])
-          ? new Set([...selected].filter((name) => name !== d[0]))
-          : new Set([...selected, d[0]])
-      )
+      setState({
+        genres: state.genres.has(d[0])
+          ? new Set([...state.genres].filter((name) => name !== d[0]))
+          : new Set([...state.genres, d[0]]),
+      })
     );
 
   rows
