@@ -36,7 +36,7 @@ const parseDate = d3.timeParse("%B %-d, %Y");
       setState({ genres })
     );
     if (showPairs) {
-      actorsDirectors(d3.select("#graph2"), movies);
+      actorsDirectors(d3.select("#graph2"), movies, genres);
     } else {
       makeRuntimeGraph(
         d3.select("#graph2"),

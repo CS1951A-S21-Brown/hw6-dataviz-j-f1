@@ -24,4 +24,4 @@ export const graph_2_width = () =>
     window.innerWidth < BREAKPOINT
       ? window.innerWidth
       : (window.innerWidth * 7) / 12,
-  graph_2_height = () => 515 + 160;
+  graph_2_height = () => 515;

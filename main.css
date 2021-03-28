@@ -42,11 +42,14 @@ td.with-bar::before {
   overflow-x: hidden;
 }
 
-#graph2 {
+#graph2:not(.runtime-graph) {
+  height: 515px;
+}
+#graph2.runtime-graph {
   margin-top: -100px;
 }
 @media (min-width: 992px) {
-  #graph2 {
+  #graph2.runtime-graph {
     margin-top: -160px;
   }
 }

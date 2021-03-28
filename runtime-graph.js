@@ -8,12 +8,13 @@ import {
 const COLOR = "#7846b5";
 export default function (target, movies, selected) {
   const width = graph_2_width() - margin.left - margin.right;
-  const height = graph_2_height() - margin.top - margin.bottom;
+  const height = graph_2_height() + 160 - margin.top - margin.bottom;
   const svg = target
     .html("")
+    .attr("class", "runtime-graph")
     .append("svg")
     .attr("width", graph_2_width())
-    .attr("height", graph_2_height())
+    .attr("height", graph_2_height() + 160)
     .append("g")
     .attr("transform", `translate(${margin.left}, ${margin.top})`);
 
