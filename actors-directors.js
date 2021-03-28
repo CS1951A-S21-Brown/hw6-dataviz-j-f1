@@ -36,24 +36,58 @@ export default function actorsDirectors(target, movies, genres) {
     ...new Set(links.flatMap((d) => [d.source, d.target])),
   ].map((d) => ({ id: d }));
 
+  let coloridx = 0;
+
+  let colored = 0;
+  const colors = d3.schemeCategory10.concat(
+    d3.schemeSet3.map((c) => d3.color(c).darker().formatHex())
+  );
+  for (const node of nodes) {
+    if (node.color) continue;
+    colored++;
+    const color = colors[coloridx];
+    coloridx = (coloridx + 1) % colors.length;
+
+    const queue = [node.id];
+    const seen = new Set();
+    while (queue.length) {
+      const neighborId = queue.pop();
+      if (seen.has(neighborId)) continue;
+      seen.add(neighborId);
+
+      console.log(neighborId);
+      const neighbor = nodes.find((n) => n.id === neighborId);
+      neighbor.color = color;
+      neighbor.links = links.filter(
+        (l) => l.source === neighborId || l.target === neighborId
+      );
+      queue.push(
+        ...neighbor.links.map((l) =>
+          l.source === node.id ? l.target : l.source
+        )
+      );
+    }
+  }
+  console.log(colored, nodes.length);
+
   const offset = 50;
   const sim = d3
     .forceSimulation()
     .nodes(nodes)
-    .velocityDecay(0.2)
+    .velocityDecay(0.15)
     .force(
       "link",
       d3.forceLink(links).id((d) => d.id)
     )
-    .force("charge", d3.forceManyBody().strength(-3).distanceMax(200))
+    .force("charge", d3.forceManyBody().strength(-5).distanceMax(200))
     .force("top", d3.forceY(-offset).strength(0.005))
     .force("bottom", d3.forceY(graph_2_height() + offset).strength(0.005))
     .force("left", d3.forceX(0).strength(0.002))
     .force("right", d3.forceX(graph_2_width()).strength(0.002))
     .force("center", d3.forceCenter(graph_2_width() / 2, graph_2_height() / 2))
-    .force("radius", d3.forceCollide(5));
+    .force("radius", d3.forceCollide(12));
 
-  sim.tick(30);
+  sim.tick(50);
 
   const link = svg
     .append("g")
@@ -67,13 +101,25 @@ export default function actorsDirectors(target, movies, genres) {
   const node = svg
     .append("g")
     .attr("stroke", "#fff")
-    .attr("stroke-width", 1.5)
+    .attr("stroke-width", 1)
     .selectAll("circle")
     .data(nodes)
     .join("circle")
-    .attr("r", 5)
-    .attr("fill", "red");
-  // .call(drag(simulation));
+    .attr("r", (d) => d3.max(d.links.map((d) => d.strength)) ** 0.55 * 3)
+    .attr("fill", (d) => d.color);
+  node
+    .append("title")
+    .text(
+      (d) =>
+        d.id +
+        " acted with \n\n" +
+        d.links
+          .map(
+            ({ source, target, strength }) =>
+              `${source.id === d.id ? target.id : source.id}: ${strength} films`
+          )
+          .join("\n")
+    );
 
   sim.on("tick", () => {
     link
