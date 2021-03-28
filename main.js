@@ -35,6 +35,7 @@ const parseDate = d3.timeParse("%B %-d, %Y");
     makeGenreTable(d3.select("#graph1"), movies, genres, (genres) =>
       setState({ genres })
     );
+    document.getElementById("net-explanation").hidden = !showPairs;
     if (showPairs) {
       actorsDirectors(d3.select("#graph2"), movies, genres);
     } else {

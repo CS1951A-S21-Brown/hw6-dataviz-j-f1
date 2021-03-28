@@ -1,4 +1,9 @@
-import { graph_2_width, graph_2_height, margin } from "./util.js";
+import {
+  graph_2_width,
+  graph_2_height,
+  addOutlinedLabel,
+  formatNumber,
+} from "./util.js";
 
 export default function actorsDirectors(target, movies, genres) {
   const svg = target
@@ -25,26 +30,29 @@ export default function actorsDirectors(target, movies, genres) {
   ];
   data.sort((a, b) => b[1].length - a[1].length);
 
-  const links = data
-    .map(([[source, target], movies]) => ({
-      source,
-      target,
-      strength: movies.length,
-    }))
-    .filter((d) => d.strength > 2);
-  const nodes = [
-    ...new Set(links.flatMap((d) => [d.source, d.target])),
-  ].map((d) => ({ id: d }));
+  let links = data.map(([[source, target], movies]) => ({
+    source,
+    target,
+    strength: movies.length,
+  }));
+  let nodes;
+
+  let minSize = 0;
+  do {
+    links = links.filter((d) => d.strength >= minSize);
+    nodes = [
+      ...new Set(links.flatMap((d) => [d.source, d.target])),
+    ].map((d) => ({ id: d }));
+    minSize++;
+  } while (nodes.length > 700 || links.length > 1900);
 
   let coloridx = 0;
 
-  let colored = 0;
   const colors = d3.schemeCategory10.concat(
     d3.schemeSet3.map((c) => d3.color(c).darker().formatHex())
   );
   for (const node of nodes) {
     if (node.color) continue;
-    colored++;
     const color = colors[coloridx];
     coloridx = (coloridx + 1) % colors.length;
 
@@ -55,7 +63,6 @@ export default function actorsDirectors(target, movies, genres) {
       if (seen.has(neighborId)) continue;
       seen.add(neighborId);
 
-      console.log(neighborId);
       const neighbor = nodes.find((n) => n.id === neighborId);
       neighbor.color = color;
       neighbor.links = links.filter(
@@ -68,7 +75,6 @@ export default function actorsDirectors(target, movies, genres) {
       );
     }
   }
-  console.log(colored, nodes.length);
 
   const offset = 50;
   const sim = d3
@@ -80,7 +86,7 @@ export default function actorsDirectors(target, movies, genres) {
       d3.forceLink(links).id((d) => d.id)
     )
     .force("charge", d3.forceManyBody().strength(-5).distanceMax(200))
-    .force("top", d3.forceY(-offset).strength(0.0055))
+    .force("top", d3.forceY(0).strength(0.0055))
     .force("bottom", d3.forceY(graph_2_height() + offset).strength(0.0055))
     .force("left", d3.forceX(0).strength(0.003))
     .force("right", d3.forceX(graph_2_width()).strength(0.003))
@@ -105,7 +111,10 @@ export default function actorsDirectors(target, movies, genres) {
     .selectAll("circle")
     .data(nodes)
     .join("circle")
-    .attr("r", (d) => d3.max(d.links.map((d) => d.strength)) ** 0.55 * 3)
+    .attr(
+      "r",
+      (d) => d3.max(d.links.map((d) => d.strength)) ** 0.55 * (5 - minSize / 2)
+    )
     .attr("fill", (d) => d.color);
   node
     .append("title")
@@ -116,7 +125,9 @@ export default function actorsDirectors(target, movies, genres) {
         d.links
           .map(
             ({ source, target, strength }) =>
-              `${source.id === d.id ? target.id : source.id}: ${strength} films`
+              `${source.id === d.id ? target.id : source.id}: ${strength} film${
+                strength == 1 ? "" : "s"
+              }`
           )
           .join("\n")
     );
@@ -130,4 +141,21 @@ export default function actorsDirectors(target, movies, genres) {
 
     node.attr("cx", (d) => d.x).attr("cy", (d) => d.y);
   });
+
+  addOutlinedLabel(
+    svg,
+    `Cutoff: at least ${minSize} shared film${minSize == 1 ? "" : "s"}`
+  )
+    .attr("transform", "translate(0, 40)")
+    .attr("pointer-events", "none");
+  addOutlinedLabel(
+    svg,
+    `${formatNumber(nodes.length)} actors visible with ${formatNumber(
+      links.length
+    )} connections and ${formatNumber(
+      d3.sum(links, (d) => d.strength)
+    )} total shared movies`
+  )
+    .attr("transform", "translate(0, 20)")
+    .attr("pointer-events", "none");
 }
