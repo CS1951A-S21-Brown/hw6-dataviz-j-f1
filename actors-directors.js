@@ -36,20 +36,24 @@ export default function actorsDirectors(target, movies, genres) {
     ...new Set(links.flatMap((d) => [d.source, d.target])),
   ].map((d) => ({ id: d }));
 
-  debugger;
+  const offset = 50;
   const sim = d3
     .forceSimulation()
     .nodes(nodes)
+    .velocityDecay(0.2)
     .force(
       "link",
       d3.forceLink(links).id((d) => d.id)
     )
     .force("charge", d3.forceManyBody().strength(-3).distanceMax(200))
-    .force("top", d3.forceY(0).strength(0.005))
-    .force("bottom", d3.forceY(graph_2_height()).strength(0.005))
-    .force("left", d3.forceX(0).strength(0.0005))
-    .force("right", d3.forceX(graph_2_width()).strength(0.0005))
-    .force("center", d3.forceCenter(graph_2_width() / 2, graph_2_height() / 2));
+    .force("top", d3.forceY(-offset).strength(0.005))
+    .force("bottom", d3.forceY(graph_2_height() + offset).strength(0.005))
+    .force("left", d3.forceX(0).strength(0.002))
+    .force("right", d3.forceX(graph_2_width()).strength(0.002))
+    .force("center", d3.forceCenter(graph_2_width() / 2, graph_2_height() / 2))
+    .force("radius", d3.forceCollide(5));
+
+  sim.tick(30);
 
   const link = svg
     .append("g")
