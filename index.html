@@ -17,7 +17,19 @@
   <body>
     <div class="header" style="position: relative">
       <h3>Assignment 6 &laquo; Data Visualization Dashboard &raquo;</h3>
-      <h4 style="text-align: center">Netflix Collection</h4>
+      <form>
+        <h4 style="text-align: center">
+          Netflix Collection,
+          <input
+            id="year-input"
+            type="number"
+            value="1972"
+            min="1942"
+            max="2019"
+            required
+          />–Present
+        </h4>
+      </form>
     </div>
     <!--  We included a basic HTML structure for the 3 graphs here. Feel free to change this if you'd like  -->
     <div class="row">
@@ -57,7 +69,7 @@
           </span>
         </p>
         <div id="net-explanation">
-          <h3 class="h5">Actor Networks, all years</h3>
+          <h3 class="h5">Actor Networks</h3>
           <p>
             Only actors who have acted in at least the indicated number of films
             together are shown. Colors are solely used for distinguishing

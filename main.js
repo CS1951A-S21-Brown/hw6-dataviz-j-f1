@@ -28,25 +28,43 @@ const parseDate = d3.timeParse("%B %-d, %Y");
 
   let genres = new Set(movies.flatMap((m) => m.listed_in));
   let showPairs = false;
+  let year = 1972;
   const setState = (updated) => {
-    genres = updated.genres ?? genres;
-    showPairs = updated.showPairs ?? showPairs;
+    genres = updated.genres || genres;
+    showPairs = updated.showPairs != null ? updated.showPairs : showPairs;
+    year = updated.year ?? year;
 
-    makeGenreTable(d3.select("#graph1"), movies, genres, (genres) =>
+    const filteredMovies = movies.filter((m) => m.release_year >= year);
+
+    makeGenreTable(d3.select("#graph1"), filteredMovies, genres, (genres) =>
       setState({ genres })
     );
     document.getElementById("net-explanation").hidden = !showPairs;
     if (showPairs) {
-      actorsDirectors(d3.select("#graph2"), movies, genres);
+      actorsDirectors(d3.select("#graph2"), filteredMovies, genres);
     } else {
-      makeRuntimeGraph(
-        d3.select("#graph2"),
-        movies.filter((m) => m.release_year >= 1972),
-        genres
-      );
+      makeRuntimeGraph(d3.select("#graph2"), filteredMovies, genres, year);
     }
   };
   window.addEventListener("resize", () => setState({}));
+
+  document.querySelector("form").onsubmit = (e) => e.preventDefault();
+  let timeout;
+  document.getElementById("year-input").oninput = (e) => {
+    const value = e.target.valueAsNumber;
+    if (value >= 1942 && value <= 2020) {
+      if (timeout) clearTimeout(timeout);
+      timeout = setTimeout(
+        () => setState({ year: value }),
+        showPairs ? 300 : 0
+      );
+      e.target.setCustomValidity("");
+      e.target.reportValidity();
+    } else {
+      e.target.setCustomValidity("enter a value between 1942 and 2019");
+      e.target.reportValidity();
+    }
+  };
 
   d3.selectAll("[name=graph-type]")
     .data([false, true])

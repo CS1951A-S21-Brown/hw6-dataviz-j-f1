@@ -6,7 +6,7 @@ import {
 } from "./util.js";
 
 const COLOR = "#7846b5";
-export default function (target, movies, selected) {
+export default function (target, movies, selected, year) {
   const width = graph_2_width() - margin.left - margin.right;
   const height = graph_2_height() + 160 - margin.top - margin.bottom;
   const svg = target
@@ -39,7 +39,7 @@ export default function (target, movies, selected) {
   }
   data.sort((a, b) => a.year - b.year);
 
-  const x = d3.scaleLinear([1972, 2020], [0, width]);
+  const x = d3.scaleLinear([year, 2020], [0, width]);
   const y = d3.scaleLinear([210, 0], [0, height]).nice();
 
   svg
@@ -48,7 +48,7 @@ export default function (target, movies, selected) {
     .attr("font-size", 20)
     .attr("font-weight", "bold")
     .attr("text-anchor", "middle")
-    .text("Average runtime by year (1972–present)");
+    .text(`Average runtime by year (${year}–Present)`);
   svg
     .append("text")
     .attr("transform", `translate(${width / 2}, -27)`)

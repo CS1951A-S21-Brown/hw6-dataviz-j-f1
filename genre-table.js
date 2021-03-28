@@ -6,13 +6,15 @@ export default function (target, movies, selected, setSelected) {
     .html("")
     .append("table")
     .style("width", graph_1_width() + "px");
-  const data = movies.reduce((acc, movie) => {
-    for (const genre of movie.listed_in) {
-      if (!acc.has(genre)) acc.set(genre, []);
-      acc.get(genre).push(movie);
-    }
-    return acc;
-  }, new Map());
+  const data = [
+    ...movies.reduce((acc, movie) => {
+      for (const genre of movie.listed_in) {
+        if (!acc.has(genre)) acc.set(genre, []);
+        acc.get(genre).push(movie);
+      }
+      return acc;
+    }, new Map()),
+  ].sort();
 
   const header = table.append("thead").append("tr");
 
@@ -21,8 +23,14 @@ export default function (target, movies, selected, setSelected) {
     .append("input")
     .attr("type", "checkbox")
     .attr("id", "checkbox-all")
-    .property("checked", selected.size === data.size)
-    .property("indeterminate", selected.size && selected.size < data.size)
+    .property(
+      "checked",
+      [...data].every(([genre]) => selected.has(genre))
+    )
+    .property(
+      "indeterminate",
+      selected.size && [...data].some(([genre]) => !selected.has(genre))
+    )
     .on("change", () =>
       setSelected(selected.size ? new Set() : new Set(data.keys()))
     );
