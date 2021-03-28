@@ -67,7 +67,7 @@ const parseDate = d3.timeParse("%B %-d, %Y");
       e.target.setCustomValidity("");
       e.target.reportValidity();
     } else {
-      e.target.setCustomValidity("enter a value between 1942 and 2019");
+      e.target.setCustomValidity("enter a value between 1942 and 2020");
       e.target.reportValidity();
     }
   };

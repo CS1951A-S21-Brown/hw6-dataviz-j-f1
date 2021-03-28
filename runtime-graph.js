@@ -115,11 +115,12 @@ export default function (target, movies, selected, year) {
     .data(data.filter((d) => d.runtime))
     .enter()
     .append("g");
+
   hovers
     .append("rect")
-    .attr("x", (d) => x(d.year - 0.5))
+    .attr("x", data.length === 1 ? 0 : (d) => x(d.year - 0.5))
     .attr("y", 0)
-    .attr("width", (d) => x(d.year) - x(d.year - 1))
+    .attr("width", data.length === 1 ? width : (d) => x(d.year) - x(d.year - 1))
     .attr("height", height)
     .classed("hoverable", true)
     .attr("fill", "transparent");
@@ -154,6 +155,7 @@ export default function (target, movies, selected, year) {
     .attr("r", 5)
     .attr("fill", COLOR)
     .style("opacity", (d) => {
+      if (data.length === 1) return 1;
       const idx = data.findIndex((el) => el.year === d.year);
       return idx === 0 ||
         idx === data.length - 1 ||
