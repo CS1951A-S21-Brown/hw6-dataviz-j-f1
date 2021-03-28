@@ -1,20 +1,25 @@
 import { graph_1_width, formatNumber } from "./util.js";
 
 // Heavily modified from an earlier chart I published here: https://observablehq.com/@j-f1/dear-blueno-analysis
-export default function (target, movies, selected, setSelected) {
+export default function (target, allMovies, year, selected, setSelected) {
   const table = target
     .html("")
     .append("table")
     .style("width", graph_1_width() + "px");
   const data = [
-    ...movies.reduce((acc, movie) => {
+    ...allMovies.reduce((acc, movie) => {
       for (const genre of movie.listed_in) {
         if (!acc.has(genre)) acc.set(genre, []);
         acc.get(genre).push(movie);
       }
       return acc;
     }, new Map()),
-  ].sort();
+  ]
+    .map(([genre, movies]) => [
+      genre,
+      movies.filter((m) => m.release_year >= year),
+    ])
+    .sort();
 
   const header = table.append("thead").append("tr");
 
@@ -42,15 +47,19 @@ export default function (target, movies, selected, setSelected) {
     .text("Genre");
   header
     .append("th")
-    .text(`Number of films (total: ${formatNumber(movies.length)})`);
+    .text(
+      `Number of films (total: ${formatNumber(
+        allMovies.filter((m) => m.release_year >= year).length
+      )})`
+    );
 
   const rows = table
     .append("tbody")
     .selectAll("tr")
     .data(data)
     .enter()
-    .append("tr");
-
+    .append("tr")
+    .style("color", (d) => (d[1].length === 0 ? "gray" : "inherit"));
   const makeId = (name) => `checkbox-${name.replace(/[^\w]+/g, "_")}`;
 
   rows
@@ -58,6 +67,8 @@ export default function (target, movies, selected, setSelected) {
     .style("width", "20px")
     .append("input")
     .attr("type", "checkbox")
+    .property("disabled", (d) => d[1].length === 0)
+    .property("indeterminate", (d) => d[1].length === 0)
     .property("checked", (d) => selected.has(d[0]))
     .attr("id", (d) => makeId(d[0]))
     .on("change", (_, d) =>

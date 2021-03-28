@@ -36,7 +36,7 @@ const parseDate = d3.timeParse("%B %-d, %Y");
 
     const filteredMovies = movies.filter((m) => m.release_year >= year);
 
-    makeGenreTable(d3.select("#graph1"), filteredMovies, genres, (genres) =>
+    makeGenreTable(d3.select("#graph1"), movies, year, genres, (genres) =>
       setState({ genres })
     );
     document.getElementById("net-explanation").hidden = !showPairs;
