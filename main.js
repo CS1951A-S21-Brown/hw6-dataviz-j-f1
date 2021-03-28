@@ -1,5 +1,6 @@
 import makeRuntimeGraph from "./runtime-graph.js";
 import makeGenreTable from "./genre-table.js";
+import actorsDirectors from "./actors-directors.js";
 
 const delist = (s) => s.split(", ").filter(Boolean);
 const parseDate = d3.timeParse("%B %-d, %Y");
@@ -25,18 +26,32 @@ const parseDate = d3.timeParse("%B %-d, %Y");
     .filter((d) => d.type === "TV Show")
     .map(({ duration, ...m }) => ({ ...m, seasons: parseInt(duration) }));
 
-  let selected = new Set(movies.flatMap((m) => m.listed_in));
-  const setSelected = (newSelected) => {
-    selected = newSelected;
+  let genres = new Set(movies.flatMap((m) => m.listed_in));
+  let showPairs = false;
+  const setState = (updated) => {
+    genres = updated.genres ?? genres;
+    showPairs = updated.showPairs ?? showPairs;
 
-    makeGenreTable(d3.select("#graph1"), movies, selected, setSelected);
-    makeRuntimeGraph(
-      d3.select("#graph2"),
-      movies.filter((m) => m.release_year >= 1972),
-      selected
+    makeGenreTable(d3.select("#graph1"), movies, genres, (genres) =>
+      setState({ genres })
     );
+    if (showPairs) {
+      actorsDirectors(d3.select("#graph2"), movies);
+    } else {
+      makeRuntimeGraph(
+        d3.select("#graph2"),
+        movies.filter((m) => m.release_year >= 1972),
+        genres
+      );
+    }
   };
-  window.addEventListener("resize", () => setSelected(selected));
+  window.addEventListener("resize", () => setState({}));
 
-  setSelected(selected);
+  d3.selectAll("[name=graph-type]")
+    .data([false, true])
+    .on("change", (_, showPairs) => {
+      setState({ showPairs });
+    });
+
+  setState({});
 })();

@@ -42,11 +42,6 @@ td.with-bar::before {
   overflow-x: hidden;
 }
 
-input[type="checkbox"] {
-  position: relative;
-  bottom: 3px;
-}
-
 #graph2 {
   margin-top: -100px;
 }

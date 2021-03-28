@@ -25,5 +25,3 @@ export const graph_2_width = () =>
       ? window.innerWidth
       : (window.innerWidth * 7) / 12,
   graph_2_height = () => 515 + 160;
-export const graph_3_width = () => window.innerWidth / 2,
-  graph_3_height = () => 575;
