@@ -1,6 +1,7 @@
 import makeRuntimeGraph from "./runtime-graph.js";
 import makeGenreTable from "./genre-table.js";
 import actorsDirectors from "./actors-directors.js";
+import { graph_2_width } from "./util.js";
 
 const delist = (s) => s.split(", ").filter(Boolean);
 const parseDate = d3.timeParse("%B %-d, %Y");
@@ -27,12 +28,12 @@ const parseDate = d3.timeParse("%B %-d, %Y");
     .map(({ duration, ...m }) => ({ ...m, seasons: parseInt(duration) }));
 
   let genres = new Set(movies.flatMap((m) => m.listed_in));
-  let showPairs = false;
+  let rightTab = 2;
   let year = 1972;
   let sort = "genre";
   const setState = (updated) => {
     genres = updated.genres || genres;
-    showPairs = updated.showPairs != null ? updated.showPairs : showPairs;
+    rightTab = updated.rightTab != null ? updated.rightTab : rightTab;
     year = updated.year ?? year;
     sort = updated.sort || sort;
 
@@ -45,11 +46,19 @@ const parseDate = d3.timeParse("%B %-d, %Y");
       { genres, sort },
       setState
     );
-    document.getElementById("net-explanation").hidden = !showPairs;
-    if (showPairs) {
+    document.getElementById("net-explanation").hidden = rightTab !== 1;
+    if (rightTab === 1) {
       actorsDirectors(d3.select("#graph2"), filteredMovies, genres);
-    } else {
+    } else if (rightTab === 0) {
       makeRuntimeGraph(d3.select("#graph2"), filteredMovies, genres, year);
+    } else {
+      d3.select("#graph2")
+        .attr("class", "writeup")
+        .html("")
+        .style("width", graph_2_width() + "px");
+      for (const child of document.getElementById("writeup").content.children) {
+        document.getElementById("graph2").appendChild(child.cloneNode(true));
+      }
     }
   };
   window.addEventListener("resize", () => setState({}));
@@ -60,10 +69,7 @@ const parseDate = d3.timeParse("%B %-d, %Y");
     const value = e.target.valueAsNumber;
     if (value >= 1942 && value <= 2020) {
       if (timeout) clearTimeout(timeout);
-      timeout = setTimeout(
-        () => setState({ year: value }),
-        showPairs ? 300 : 0
-      );
+      timeout = setTimeout(() => setState({ year: value }), rightTab ? 300 : 0);
       e.target.setCustomValidity("");
       e.target.reportValidity();
     } else {
@@ -73,9 +79,9 @@ const parseDate = d3.timeParse("%B %-d, %Y");
   };
 
   d3.selectAll("[name=graph-type]")
-    .data([false, true])
-    .on("change", (_, showPairs) => {
-      setState({ showPairs });
+    .data([0, 1, 2])
+    .on("change", (_, rightTab) => {
+      setState({ rightTab });
     });
 
   setState({});

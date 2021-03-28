@@ -97,8 +97,8 @@ export default function actorsDirectors(target, movies, genres) {
 
   const link = svg
     .append("g")
-    .attr("stroke", "#999")
-    .attr("stroke-opacity", 0.6)
+    .attr("stroke", "black")
+    .attr("stroke-opacity", 0.3)
     .selectAll("line")
     .data(links)
     .join("line")
@@ -106,7 +106,7 @@ export default function actorsDirectors(target, movies, genres) {
 
   const node = svg
     .append("g")
-    .attr("stroke", "#fff")
+    .attr("stroke", "white")
     .attr("stroke-width", 1)
     .selectAll("circle")
     .data(nodes)
@@ -152,9 +152,7 @@ export default function actorsDirectors(target, movies, genres) {
     svg,
     `${formatNumber(nodes.length)} actors visible with ${formatNumber(
       links.length
-    )} connections and ${formatNumber(
-      d3.sum(links, (d) => d.strength)
-    )} total shared movies`
+    )} connections`
   )
     .attr("transform", "translate(0, 20)")
     .attr("pointer-events", "none");

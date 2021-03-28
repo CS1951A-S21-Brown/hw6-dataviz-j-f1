@@ -45,6 +45,11 @@ td.with-bar::before {
 #graph2:not(.runtime-graph) {
   height: 515px;
 }
+#graph2.writeup {
+  overflow-y: scroll;
+  padding-right: 3em;
+  height: 509px;
+}
 #graph2.runtime-graph {
   margin-top: -100px;
 }

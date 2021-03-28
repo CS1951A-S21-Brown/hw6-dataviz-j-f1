@@ -47,7 +47,6 @@
               name="graph-type"
               id="graph-switcher-runtime"
               autocomplete="off"
-              checked
             />
             <label
               class="btn btn-outline-success btn-sm"
@@ -67,6 +66,20 @@
               for="graph-switcher-pairs"
               >Actor Networks</label
             >
+
+            <input
+              type="radio"
+              class="btn-check"
+              name="graph-type"
+              id="graph-switcher-written"
+              autocomplete="off"
+              checked
+            />
+            <label
+              class="btn btn-outline-success btn-sm"
+              for="graph-switcher-written"
+              >Written Questions</label
+            >
           </span>
         </p>
         <div id="net-explanation">
@@ -82,6 +95,153 @@
         </div>
       </div>
     </div>
+    <template id="writeup">
+      <h3>Written Questions</h3>
+      <strong
+        >writeup contains some hints for navigating the visualization</strong
+      >
+      <ol>
+        <li>
+          <em>
+            Describe how your dashboard answers the questions presented. You
+            don't have to address every question directly, but should at a high
+            level address the main questions.
+          </em>
+          <p>
+            The table/bar chart on the left side allows viewing the number of
+            films in each genre for a given year range, answering question 1. It
+            doesn’t report any data about TV shows, but since all the other
+            visualizations only use data from movies, I thought it would be
+            confusing to suddenly change that for this chart. It also allows
+            sorting by genre alphabetically or by number of films.
+          </p>
+          <p>
+            The “Runtime by Year” tab addresses the number of movies per year
+            question, additionally allowing filtering by genre.
+          </p>
+          <p>
+            The “Actor Networks” tab is my attempt at answering the third
+            question. It tries to provide a overview of actors who collaborated
+            multiple times, subject to the constraints imposed by showing
+            possibly thousands of nodes/edges in the browser. Selecting a more
+            recent year or unchecking some genres will decrease the cutoff.
+          </p>
+        </li>
+        <li>
+          <em>
+            List 3 reasons why D3 was helpful and improved your visualization (6
+            points)
+          </em>
+          <ol>
+            <li>
+              It was very flexible, allowing me to use very similar techniques
+              to render out an html <code>&lt;table&gt;</code> or a complex
+              force graph.
+            </li>
+            <li>
+              I am already quite familiar with D3 so I can use it more
+              effectively than many other tools.
+            </li>
+            <li>
+              D3 provides some minimal presets for complicated things like axes
+              which would be a pain to draw manually.
+            </li>
+          </ol>
+        </li>
+        <li>
+          <em>
+            List 3 reasons why D3 would not be the best tool for creating a
+            visualization (6 points)
+          </em>
+          <ol>
+            <li>
+              D3 is JavaScript-based, meaning that it will be slower than native
+              solutions for data visualizations that require high performance.
+            </li>
+            <li>
+              D3 is code-based, meaning that it's harder to use for
+              nonprogrammers, and provides less immediate feedback than
+              graphical tools like Excel or Tableau.
+            </li>
+            <li>
+              D3 is fairly bare-bones: you can create amazing visualizations,
+              but there’s no “create a quick bar chart” function. You have to
+              manually set up the axes and figure out how to draw everything.
+            </li>
+          </ol>
+        </li>
+        <li>
+          <em>
+            Evaluate the accessibility of your dashboard based on the readings
+            in the “Before you begin” section. What kinds of users might find
+            this dashboard accessible and who might have more difficulty? What
+            additional actions might you take to make this dashboard more
+            accessible to all audiences? Your response should refer to at least
+            one of the readings and be about 1 paragraph.
+          </em>
+          <p>
+            I used a standard table element in the genre table. This means that
+            a user of assistive technology would likely be able to read it just
+            fine, albeit without access to the bars for context.
+          </p>
+          <p>
+            I did not invest anythingn into screen reader accessibility for the
+            other two charts. It‘s possible a screen reader could make something
+            of them, but there isn’t a good way to automatically generate the
+            kinds of summaries described by
+            <em>Why Accessibility Is at the Heart of Data Visualization</em>
+            that I know of when the user can change multiple aspects of the data
+            at runtime.
+          </p>
+          <p>
+            Across my graphics, I did my best to make color only incidental. The
+            genre and runtime graphs should look just fine without color vision,
+            and the actor network graph would still be somewhat differentiable
+            by brightness. Since the colors of the actor network graph are only
+            present to aid in identifying networks, I don’t think they’re very
+            important.
+          </p>
+          <p>
+            The network graph is also always slightly animated; this could be a
+            problem for people with motion sickness issues. There isn’t really a
+            good way to fix this without making the user wait until the
+            animation is done before showing the result to them.
+          </p>
+          <p>
+            I would increase accessibility by developing an automated label for
+            the average runtime graph, and providing a dynamic link to download
+            the data being displayed by the runtime graph which would update
+            when different genres and years are selected.
+          </p>
+        </li>
+        <li>
+          <em>
+            Reflect on the stages of your design and implementation process when
+            you could have taken steps to make your dashboard more accessible to
+            all audiences. What are some factors that kept you from taking these
+            steps? (a few sentences)
+          </em>
+          <p>
+            My project was kind of rushed and I designed most of it on the fly.
+            I need to teach myself to use VoiceOver (the screen reader) on my
+            Mac. While I’m fairly good at using VoiceOver on my phone, this data
+            visualization doesn’t work very well on mobile devices. I think that
+            the best way to improve accessibility would be to use screen readers
+            and other tools to navigate the visualization, then identify times
+            where I hit bumps in the process and fix them. I also need to learn
+            more about accessibility on the web in general — again, I consider
+            myself somewhat proficient in designing accessible iOS apps but not
+            web apps.
+          </p>
+          <p>
+            I could have made my dashboard more accessible by giving myself an
+            earlier due date to complete the visible/mouse-interactible
+            visualizations, then spending a couple of days working on
+            integrating accessibility features.
+          </p>
+        </li>
+      </ol>
+    </template>
     <!--Feel free to add more JavaScript files as needed-->
     <script type="module" src="main.js"></script>
   </body>
